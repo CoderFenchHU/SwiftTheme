@@ -49,19 +49,17 @@ import UIKit
     
     public class func image(for keyPath: String) -> UIImage? {
         guard let imageName = string(for: keyPath) else { return nil }
-        if let filePath = currentThemePath?.URL?.appendingPathComponent(imageName).path {
-            guard let image = UIImage(contentsOfFile: filePath) else {
-                print("SwiftTheme WARNING: Not found image at file path: \(filePath)")
-                return nil
-            }
+        if let filePath = currentThemePath?.URL?.appendingPathComponent(imageName).path,
+           let image = UIImage(contentsOfFile: filePath)
+        {
             return image
-        } else {
-            guard let image = UIImage(named: imageName) else {
-                print("SwiftTheme WARNING: Not found image name at main bundle: \(imageName)")
-                return nil
-            }
+        } else if let url = currentThemePath?.URL,
+                  let bundle = Bundle(url: url),
+                  let image = UIImage(named: imageName, in: bundle, compatibleWith: nil)
+        {
             return image
         }
+        return UIImage(named: imageName) 
     }
     
     public class func font(for keyPath: String) -> UIFont? {

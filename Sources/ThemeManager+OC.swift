@@ -24,6 +24,9 @@ import Foundation
         setTheme(plistName: plistName, path: .sandbox(path))
     }
     
+    public class func setThemeWithPlistInBundle(_ plistName: String, bundleName: String) {
+        setTheme(plistName: plistName, path: .bundle(bundleName))
+    }
     
     /**
        extension for Objective-C, Use setTheme(jsonName: String, path: ThemePath) in Swift
@@ -37,6 +40,10 @@ import Foundation
     */
     public class func setThemeWithJsonInSandbox(_ jsonName: String, path: URL) {
         setTheme(jsonName: jsonName, path: .sandbox(path))
+    }
+    
+    public class func setThemeWithJsonInBundle(_ jsonName: String, bundleName: String) {
+        setTheme(jsonName: jsonName, path: .bundle(bundleName))
     }
 
     /**
@@ -53,4 +60,7 @@ import Foundation
         setTheme(dict: dict, path: .sandbox(path))
     }
     
+    public class func setThemeWithDictInBundle(_ dict: NSDictionary, bundleName: String) {
+        setTheme(dict: dict, path: .bundle(bundleName))
+    }
 }

@@ -23,6 +23,24 @@ extension NSObject {
     
     typealias ThemePickers = [String: ThemePicker]
     
+    typealias SwizzMethodList = [String : Bool]
+    
+    
+    
+    var themeSwizzMethodList: SwizzMethodList {
+        get {
+            if let themePickers = objc_getAssociatedObject(self, &isChangeMethodKey) as? SwizzMethodList {
+                return themePickers
+            }
+            let initValue = SwizzMethodList()
+            objc_setAssociatedObject(self, &isChangeMethodKey, initValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+            return initValue
+        }
+        set {
+            objc_setAssociatedObject(self, &isChangeMethodKey, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+        }
+    }
+    
     var themePickers: ThemePickers {
         get {
             if let themePickers = objc_getAssociatedObject(self, &themePickersKey) as? ThemePickers {
@@ -35,6 +53,15 @@ extension NSObject {
         set {
             objc_setAssociatedObject(self, &themePickersKey, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
             if newValue.isEmpty == false { _setupThemeNotification() }
+        }
+    }
+    
+    var isIgnoreTheme: Bool {
+        get {
+            return objc_getAssociatedObject(self, &isIgnoreThemeKey) as? Bool ?? false
+        }
+        set {
+            objc_setAssociatedObject(self, &isIgnoreThemeKey, newValue, .OBJC_ASSOCIATION_ASSIGN)
         }
     }
     
@@ -52,6 +79,11 @@ extension NSObject {
 
         guard responds(to: sel)           else { return }
         guard let value = picker?.value() else { return }
+        
+        
+        if (self is UIView && selector == "setBackgroundColor:") || (self is UILabel && selector == "setTextColor:"){
+            self.themeSwizzMethodList[selector] = true
+        }
         
         if let statePicker = picker as? ThemeStatePicker {
             let setState = unsafeBitCast(method(for: sel), to: setValueForStateIMP.self)
@@ -138,3 +170,5 @@ extension NSObject {
 
 private var themePickersKey = ""
 private var addPickerNotificationKey = ""
+private var isChangeMethodKey = ""
+private var isIgnoreThemeKey = ""
